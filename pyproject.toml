@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bpcmp"
+requires-python = ">=3.10"
+dynamic = ["version"]
+authors = [
+    {name = "Jai Sachdev", email = "jsachdev@pppl.gov"},
+]
+description = "Comparison tool for ADIOS2 bp output"
+readme = "README.md"
+keywords = ["ADIOS2", "comparison", "regression testing"]
+license = {text = "GNU General Public License 3"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dependencies = [
+    "setuptools-scm",
+    "numpy",
+    "adios2",
+    "termcolor",
+    "autopep8",
+    "flake8"
+]
+
+[project.optional-dependencies]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "readthedocs-sphinx-search",
+    "sphinx-autobuild"
+]
+
+[project.scripts]
+bpcmp = "bpcmp.bpcmp:main"
+
+[tool.setuptools_scm]
+
+[tool.autopep8]
+max_line_length = 160
+recursive = true
+in-place = true
+aggressive = 3
