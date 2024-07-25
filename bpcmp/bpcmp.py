@@ -26,7 +26,7 @@ class BPCMP:
         bpcmp out1.bp out2.bp
 
         Arguments:
-        -v LEVEL    Use for verbose output of comparison (1: report errors only, 2: report everything)
+        -v LEVEL    Use for verbose output of comparison: (0,1,2) to report (nothing, errors only, everything)
         -r RTOL     Set the relative tolerance when comparing float variables (default is zero)
         -a ATOL     Set the absolute tolerance when comparing float variables (default is zero)
         --ignore-atts IGNORE_ATTS   Provide list of attributes to ignore
@@ -74,8 +74,8 @@ class BPCMP:
                             type=float,
                             default=0.0)
         parser.add_argument('-v', '--verbose',
-                            help='verbose output (0: none, 1: report errors only, 2: report everything)',
-                            nargs='?',
+                            help='verbose output: (0,1,2) to report (nothing, errors only, everything)',
+                            type=int,
                             default=0)
         parser.add_argument('--ignore-atts',
                             help='List of attributes to ignore',
@@ -115,7 +115,7 @@ class BPCMP:
         if args.verbose is None:
             self.verbose = 1
         elif int(args.verbose) < 0 or int(args.verbose) > 2:
-            raise argparse.ArgumentTypeError('Invalid verbose level: (0,1,2) = report (nothing, errors only, everything)')
+            raise argparse.ArgumentTypeError('Invalid verbose level: (0,1,2) to report (nothing, errors only, everything)')
         else:
             self.verbose = int(args.verbose)
 
