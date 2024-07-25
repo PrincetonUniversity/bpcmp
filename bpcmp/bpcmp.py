@@ -26,9 +26,9 @@ class BPCMP:
         bpcmp out1.bp out2.bp
 
         Arguments:
-        -v          Use for verbose output of comparison
-        -r [RTOL]   Set the relative tolerance when comparing float variables (default is zero)
-        -a [ATOL]   Set the absolute tolerance when comparing float variables (default is zero)
+        -v LEVEL    Use for verbose output of comparison (1: report errors only, 2: report everything)
+        -r RTOL     Set the relative tolerance when comparing float variables (default is zero)
+        -a ATOL     Set the absolute tolerance when comparing float variables (default is zero)
         --ignore-atts IGNORE_ATTS   Provide list of attributes to ignore
         --ignore-vars IGNORE_VARS   Provide list of variables to ignore
 
@@ -44,7 +44,7 @@ class BPCMP:
         # Inputs
         self.output1 = None
         self.output2 = None
-        self.verbose = False  # Verbose output (write out differences)
+        self.verbose = 0  # Verbose output level (write out differences)
         self.rtol = 0.0  # relative tolerance
         self.atol = 0.0  # absolute tolerance
         self.ignore_atts = []  # List of attributes to ignore
@@ -56,6 +56,7 @@ class BPCMP:
     def parse_arguments(self) -> None:
         """Parse command line arguments"""
 
+        # Define arguments
         description = 'bpcmp utility for comparing ADIOS2 bp output'
         parser = argparse.ArgumentParser(description=description)
         parser.add_argument('output1',
@@ -65,17 +66,17 @@ class BPCMP:
                             help='ADIOS2 bp output number 2',
                             default=None)
         parser.add_argument('-r', '--rtol',
-                            help='relative tolerance',
+                            help='relative tolerance (default is zero)',
                             type=float,
                             default=0.0)
         parser.add_argument('-a', '--atol',
-                            help='absolute tolerance',
+                            help='absolute tolerance (default is zero)',
                             type=float,
                             default=0.0)
         parser.add_argument('-v', '--verbose',
-                            help='verbose output',
-                            action='store_true',
-                            default=False)
+                            help='verbose output (0: none, 1: report errors only, 2: report everything)',
+                            nargs='?',
+                            default=0)
         parser.add_argument('--ignore-atts',
                             help='List of attributes to ignore',
                             nargs='+',
@@ -111,7 +112,12 @@ class BPCMP:
             sys.exit(1)
         self.rtol = args.rtol
 
-        self.verbose = args.verbose
+        if args.verbose is None:
+            self.verbose = 1
+        elif int(args.verbose) < 0 or int(args.verbose) > 2:
+            raise argparse.ArgumentTypeError('Invalid verbose level: (0,1,2) = report (nothing, errors only, everything)')
+        else:
+            self.verbose = int(args.verbose)
 
         if args.ignore_atts:
             self.ignore_atts = args.ignore_atts.copy()
@@ -124,7 +130,7 @@ class BPCMP:
         print(f'ADIOS2 bp output 2: {self.output2}')
         print(f'Absolute tolerance: {self.atol:e}')
         print(f'Relative tolerance: {self.rtol:e}')
-        print(f'Verbose output: {self.verbose}')
+        print(f'Verbose output level: {self.verbose}')
         if len(self.ignore_atts) > 0:
             print(f'Ignored attributes: {self.ignore_atts}')
         if len(self.ignore_vars) > 0:
@@ -184,7 +190,7 @@ class BPCMP:
                                f'{self.output2} = {v2}')
                         print(msg)
                 else:
-                    if self.verbose:
+                    if self.verbose == 2:
                         att = colored(f'{v}', color='blue', attrs=['bold'])
                         msg = (colored('PASS:  ', color='blue', attrs=['bold']) +
                                f'Attribute {att} is the same in both outputs')
@@ -212,7 +218,7 @@ class BPCMP:
                                f'{maxdiff}')
                         print(msg)
                 else:
-                    if self.verbose:
+                    if self.verbose == 2:
                         msg = ''
                         att = colored(f'{v}', color='blue', attrs=['bold'])
                         msg = (colored('PASS:  ', color='blue', attrs=['bold']) +
@@ -259,7 +265,7 @@ class BPCMP:
                            f'{maxdiff}')
                     print(msg)
             else:
-                if self.verbose:
+                if self.verbose == 2:
                     msg = ''
                     var = colored(f'{v}', color='blue', attrs=['bold'])
                     msg = (colored('PASS:  ', color='blue', attrs=['bold']) +
