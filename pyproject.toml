@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "bpcmp"
 requires-python = ">=3.10"
-version = "0.0.3"
+version = "0.0.4"
 authors = [
     {name = "Jai Sachdev", email = "jsachdev@pppl.gov"},
 ]
