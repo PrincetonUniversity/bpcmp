@@ -20,12 +20,14 @@ dependencies = [
     "setuptools-scm",
     "numpy",
     "adios2",
-    "termcolor",
-    "autopep8",
-    "flake8"
+    "termcolor"
 ]
 
 [project.optional-dependencies]
+dev = [
+    "autopep8",
+    "flake8"
+]
 docs = [
     "sphinx",
     "sphinx_rtd_theme",
