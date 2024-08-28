@@ -6,10 +6,18 @@ Inspired by this [gist](https://gist.github.com/jychoi-hpc/b4654e178edd84c9b8a2a
 
 Floating point comparison done using numpy [allclose](https://numpy.org/doc/stable/reference/generated/numpy.allclose.html).
 
-Install with pip:
+Install from PyPi:
 
 ```
-pip install -e .
+pip install bpcmp
+```
+
+Install from source:
+
+```
+git clone git@github.com:PrincetonUniversity/bpcmp.git
+cd bpcmp
+pip install .   # include the -e option to make the installation editable
 ```
 
 Usage:
