@@ -39,3 +39,9 @@ All of the arguments are optional.
 ```
 bpcmp out1.bp out.bp -v 1 -r 0.000001 -a 0.0001 --ignore-atts att1 att2 --ignore-vars var1 var2
 ```
+
+Also included is a `bpdump` utility for dumping the contents of ADIOS2 bp output to the screen:
+
+```
+bpdump out1.bp
+```
