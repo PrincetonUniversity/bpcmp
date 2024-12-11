@@ -8,9 +8,9 @@ import numpy as np
 
 def main():
     """
-    Utility for comparing two ADIOS2 bp output files. The user specifies the file locations and
-    can customize the comparison by setting verbosity levels, absolute/relative tolerances, and
-    attributes/variables to ignore.
+    Utility for comparing two ADIOS2 bp output files. The user specifies the
+    file locations and can customize the comparison by setting verbosity
+    levels, absolute/relative tolerances, and attributes/variables to ignore.
 
     Floating-point comparisons are performed using numpy's `allclose` function:
         np.allclose(): abs(arr1 - arr2) <= (atol + rtol * abs(arr2))
@@ -54,29 +54,30 @@ def main():
 
     # Validate the paths to the output files
     if not os.path.exists(args.output1):
-        print(colored(f'ERROR: Output file does not exist: {args.output1}', color='red', attrs=['bold']))
-        sys.exit(1)
+        msg = colored(f'ERROR: Output file does not exist: {args.output1}', color='red', attrs=['bold'])
+        raise FileNotFoundError(msg)
     output1 = args.output1
 
     if not os.path.exists(args.output2):
-        print(colored(f'ERROR: Output file does not exist: {args.output2}', color='red', attrs=['bold']))
-        sys.exit(1)
+        msg = colored(f'ERROR: Output file does not exist: {args.output2}', color='red', attrs=['bold'])
+        raise FileNotFoundError(msg)
     output2 = args.output2
 
     # Validate and set tolerances
     if args.atol < 0.0:
-        print(colored(f'ERROR: Absolute tolerance cannot be negative: {args.atol}', color='red', attrs=['bold']))
-        sys.exit(1)
+        msg = colored(f'ERROR: Absolute tolerance cannot be negative: {args.atol}', color='red', attrs=['bold'])
+        raise argparse.ArgumentTypeError(msg)
     atol = args.atol
 
     if args.rtol < 0.0:
-        print(colored(f'ERROR: Relative tolerance cannot be negative: {args.rtol}', color='red', attrs=['bold']))
-        sys.exit(1)
+        msg = colored(f'ERROR: Relative tolerance cannot be negative: {args.rtol}', color='red', attrs=['bold'])
+        raise argparse.ArgumentTypeError(msg)
     rtol = args.rtol
 
     # Set verbosity level
     if args.verbose not in (0, 1, 2):
-        raise argparse.ArgumentTypeError('Invalid verbosity level. Choose from: 0 (none), 1 (errors), 2 (all)')
+        msg = colored('Invalid verbosity level. Choose from: 0 (none), 1 (errors), 2 (all)', color='red', attrs=["bold"])
+        raise argparse.ArgumentTypeError(msg)
     verbose = args.verbose
 
     # Copy ignore lists if provided
