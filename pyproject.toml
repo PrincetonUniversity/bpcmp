@@ -37,6 +37,7 @@ docs = [
 
 [project.scripts]
 bpcmp = "bpcmp.bpcmp:main"
+bpdump = "bpcmp.bpdump:main"
 
 [tool.setuptools_scm]
 

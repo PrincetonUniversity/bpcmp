@@ -242,3 +242,7 @@ def main():
         print(colored(f"{num_differences} differences found between {output1} and {output2}", attrs=["bold"]))
 
     sys.exit(0 if num_differences == 0 else 1)
+
+
+if __name__ == "__main__":
+    main()
