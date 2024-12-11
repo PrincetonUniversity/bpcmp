@@ -150,8 +150,7 @@ def main():
                     att = colored(f"{v}", color="red", attrs=["bold"])
                     msg = (colored("DIFF:  ", color="red", attrs=["bold"]) +
                            f"Attribute {att} has differences: " +
-                           f"{output1} = {v1} and " +
-                           f"{output2} = {v2}")
+                           f"{output1} = {v1} and {output2} = {v2}")
                     print(msg)
             else:
                 if verbose == 2:
@@ -170,16 +169,14 @@ def main():
                     att = colored(f"{v}", color="red", attrs=["bold"])
                     msg = (colored("ERROR: ", color="red", attrs=["bold"]) +
                            f"Attribute {att} has inconsistent types: " +
-                           f"{output1} = {v1} and " +
-                           f"{output2} = {v2}")
+                           f"{output1} = {v1} and {output2} = {v2}")
                     print(msg)
             elif not same:
                 num_differences += 1
                 if verbose:
                     att = colored(f"{v}", color="red", attrs=["bold"])
                     msg = (colored("DIFF:  ", color="red", attrs=["bold"]) +
-                           f"Attribute {att} has differences, max difference: " +
-                           f"{maxdiff}")
+                           f"Attribute {att} has differences, max difference: {maxdiff}")
                     print(msg)
             else:
                 if verbose == 2:
@@ -217,16 +214,14 @@ def main():
                 var = colored(f"{v}", color="red", attrs=["bold"])
                 msg = (colored("ERROR: ", color="red", attrs=["bold"]) +
                        f"Variable {var} has inconsistent shapes: " +
-                       f"{output1} = {v1.shape} and " +
-                       f"{output2} = {v2.shape}")
+                       f"{output1} = {v1.shape} and {output2} = {v2.shape}")
                 print(msg)
         elif not same:
             num_differences += 1
             if verbose:
                 var = colored(f"{v}", color="red", attrs=["bold"])
                 msg = (colored("DIFF:  ", color="red", attrs=["bold"]) +
-                       f"Variable {var} has differences, max difference: " +
-                       f"{maxdiff}")
+                       f"Variable {var} has differences, max difference: {maxdiff}")
                 print(msg)
         else:
             if verbose == 2:
