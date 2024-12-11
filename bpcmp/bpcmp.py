@@ -96,7 +96,7 @@ def main():
         print(f"Variables to ignore: {ignore_vars}")
     print("")
 
-    def compare_values(v1, v2):
+    def compare_values(val1, val2):
         """
         Compare two values (scalars or arrays) using specified tolerances.
 
@@ -104,13 +104,13 @@ def main():
             tuple: (bool, max difference) where the bool indicates if values are equal.
         """
         # Handle scalar comparison
-        if np.isscalar(v1) and np.isscalar(v2):
-            return v1 == v2, abs(v2 - v1)
+        if np.isscalar(val1) and np.isscalar(val2):
+            return val1 == val2, abs(val2 - val1)
 
         # Handle array comparison
-        elif isinstance(v1, np.ndarray) and isinstance(v2, np.ndarray):
-            if v1.shape == v2.shape:
-                return np.allclose(v1, v2, rtol=rtol, atol=atol), np.max(np.abs(v2 - v1))
+        elif isinstance(val1, np.ndarray) and isinstance(val2, np.ndarray):
+            if val1.shape == val2.shape:
+                return np.allclose(val1, val2, rtol=rtol, atol=atol), np.max(np.abs(val2 - val1))
             else:
                 return False, None
 
@@ -122,111 +122,111 @@ def main():
     f2 = ad.FileReader(output2)
 
     # Compare attributes
-    for v in f1.available_attributes():
+    for attribute in f1.available_attributes():
         # Skip current attribute if in the ignore list
-        if v in ignore_atts:
+        if attribute in ignore_atts:
             continue
 
         # Read attribute from output 1
-        v1 = f1.available_attributes()[v]["Value"]
+        att1 = f1.available_attributes()[attribute]["Value"]
 
         # Read attribute from output 2, report as difference if attribute does not exist
         try:
-            v2 = f2.available_attributes()[v]["Value"]
+            att2 = f2.available_attributes()[attribute]["Value"]
         except Exception:
             num_differences += 1
             if verbose:
-                att = colored(f"{v}", color="yellow", attrs=["bold"])
+                att = colored(f"{attribute}", color="yellow", attrs=["bold"])
                 msg = (colored("NOATT: ", color="yellow", attrs=["bold"]) +
                        f"Attribute {att} found in {output1} but not {output2}")
                 print(msg)
             continue
 
         # Compare the attributes based on types
-        if f1.available_attributes()[v]["Type"] == "string":
-            if v1 != v2:
+        if f1.available_attributes()[attribute]["Type"] == "string":
+            if att1 != att2:
                 num_differences += 1
                 if verbose:
-                    att = colored(f"{v}", color="red", attrs=["bold"])
+                    att = colored(f"{attribute}", color="red", attrs=["bold"])
                     msg = (colored("DIFF:  ", color="red", attrs=["bold"]) +
                            f"Attribute {att} has differences: " +
-                           f"{output1} = {v1} and {output2} = {v2}")
+                           f"{output1} = {att1} and {output2} = {att2}")
                     print(msg)
             else:
                 if verbose == 2:
-                    att = colored(f"{v}", color="blue", attrs=["bold"])
+                    att = colored(f"{attribute}", color="blue", attrs=["bold"])
                     msg = (colored("PASS:  ", color="blue", attrs=["bold"]) +
                            f"Attribute {att} is the same in both outputs")
                     print(msg)
         else:
             # Re-reading input as integer or float (could be scalars or lists)
-            v1 = f1.read_attribute(v)
-            v2 = f2.read_attribute(v)
-            same, maxdiff = compare_values(v1, v2)
+            att1 = f1.read_attribute(attribute)
+            att2 = f2.read_attribute(attribute)
+            same, maxdiff = compare_values(att1, att2)
             if maxdiff is None:
                 num_differences += 1
                 if verbose:
-                    att = colored(f"{v}", color="red", attrs=["bold"])
+                    att = colored(f"{attribute}", color="red", attrs=["bold"])
                     msg = (colored("ERROR: ", color="red", attrs=["bold"]) +
                            f"Attribute {att} has inconsistent types: " +
-                           f"{output1} = {v1} and {output2} = {v2}")
+                           f"{output1} = {att1} and {output2} = {att2}")
                     print(msg)
             elif not same:
                 num_differences += 1
                 if verbose:
-                    att = colored(f"{v}", color="red", attrs=["bold"])
+                    att = colored(f"{attribute}", color="red", attrs=["bold"])
                     msg = (colored("DIFF:  ", color="red", attrs=["bold"]) +
                            f"Attribute {att} has differences, max difference: {maxdiff}")
                     print(msg)
             else:
                 if verbose == 2:
                     msg = ""
-                    att = colored(f"{v}", color="blue", attrs=["bold"])
+                    att = colored(f"{attribute}", color="blue", attrs=["bold"])
                     msg = (colored("PASS:  ", color="blue", attrs=["bold"]) +
                            f"Attribute {att} is the same in both outputs")
                     print(msg)
 
     # Compare variables (note that in ADIOS 2, variables cannot be strings)
-    for v in f1.available_variables():
+    for variable in f1.available_variables():
         # Skip current variable if in the ignore list
-        if v in ignore_vars:
+        if variable in ignore_vars:
             continue
 
         # Read variable from output 1
-        v1 = f1.read(v)
+        var1 = f1.read(variable)
 
         # Read attribute from output 2, report as difference if attribute does not exist
         try:
-            v2 = f2.read(v)
+            var2 = f2.read(variable)
         except Exception:
             num_differences += 1
             if verbose:
-                var = colored(f"{v}", color="yellow", attrs=["bold"])
+                var = colored(f"{variable}", color="yellow", attrs=["bold"])
                 msg = (colored("NOVAR: ", color="yellow", attrs=["bold"]) +
                        f"Variable {var} found in {output1} but not {output2}")
                 print(msg)
             continue
 
-        same, maxdiff = compare_values(v1, v2)
+        same, maxdiff = compare_values(var1, var2)
         if maxdiff is None:
             num_differences += 1
             if verbose:
-                var = colored(f"{v}", color="red", attrs=["bold"])
+                var = colored(f"{variable}", color="red", attrs=["bold"])
                 msg = (colored("ERROR: ", color="red", attrs=["bold"]) +
                        f"Variable {var} has inconsistent shapes: " +
-                       f"{output1} = {v1.shape} and {output2} = {v2.shape}")
+                       f"{output1} = {var1.shape} and {output2} = {var2.shape}")
                 print(msg)
         elif not same:
             num_differences += 1
             if verbose:
-                var = colored(f"{v}", color="red", attrs=["bold"])
+                var = colored(f"{variable}", color="red", attrs=["bold"])
                 msg = (colored("DIFF:  ", color="red", attrs=["bold"]) +
                        f"Variable {var} has differences, max difference: {maxdiff}")
                 print(msg)
         else:
             if verbose == 2:
                 msg = ""
-                var = colored(f"{v}", color="blue", attrs=["bold"])
+                var = colored(f"{variable}", color="blue", attrs=["bold"])
                 msg = (colored("PASS:  ", color="blue", attrs=["bold"]) +
                        f"Variable {var} is the same in both outputs")
                 print(msg)
