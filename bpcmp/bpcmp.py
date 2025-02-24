@@ -1,6 +1,7 @@
 import os
 import sys
 import argparse
+from importlib import metadata
 from termcolor import colored
 import adios2 as ad
 import numpy as np
@@ -33,7 +34,7 @@ def main():
     """
 
     # Print welcome message
-    print(colored("bpcmp: ADIOS2 bp output comparison utility\n", attrs=["bold"]))
+    print(colored(f"bpcmp: ADIOS2 bp output comparison utility, v{metadata.version('bpcmp')}\n", attrs=["bold"]))
 
     # Counter for the number of detected differences
     num_differences = 0
@@ -54,23 +55,23 @@ def main():
 
     # Validate the paths to the output files
     if not os.path.exists(args.output1):
-        msg = colored(f"ERROR: Output file does not exist: {args.output1}", color="red", attrs=["bold"])
+        msg = colored(f"Output file does not exist: {args.output1}", color="red", attrs=["bold"])
         raise FileNotFoundError(msg)
     output1 = args.output1
 
     if not os.path.exists(args.output2):
-        msg = colored(f"ERROR: Output file does not exist: {args.output2}", color="red", attrs=["bold"])
+        msg = colored(f"Output file does not exist: {args.output2}", color="red", attrs=["bold"])
         raise FileNotFoundError(msg)
     output2 = args.output2
 
     # Validate and set tolerances
     if args.atol < 0.0:
-        msg = colored(f"ERROR: Absolute tolerance cannot be negative: {args.atol}", color="red", attrs=["bold"])
+        msg = colored(f"Absolute tolerance cannot be negative: {args.atol}", color="red", attrs=["bold"])
         raise argparse.ArgumentTypeError(msg)
     atol = args.atol
 
     if args.rtol < 0.0:
-        msg = colored(f"ERROR: Relative tolerance cannot be negative: {args.rtol}", color="red", attrs=["bold"])
+        msg = colored(f"Relative tolerance cannot be negative: {args.rtol}", color="red", attrs=["bold"])
         raise argparse.ArgumentTypeError(msg)
     rtol = args.rtol
 
@@ -105,7 +106,7 @@ def main():
         """
         # Handle scalar comparison
         if np.isscalar(val1) and np.isscalar(val2):
-            return val1 == val2, abs(val2 - val1)
+            return np.allclose([val1], [val2], rtol=rtol, atol=atol), np.max(np.abs(val2 - val1))
 
         # Handle array comparison
         elif isinstance(val1, np.ndarray) and isinstance(val2, np.ndarray):
@@ -121,18 +122,22 @@ def main():
     f1 = ad.FileReader(output1)
     f2 = ad.FileReader(output2)
 
+    # Get available attributes
+    f1_attributes = f1.available_attributes()
+    f2_attributes = f2.available_attributes()
+
     # Compare attributes
-    for attribute in f1.available_attributes():
+    for attribute in f1_attributes:
         # Skip current attribute if in the ignore list
         if attribute in ignore_atts:
             continue
 
         # Read attribute from output 1
-        att1 = f1.available_attributes()[attribute]["Value"]
+        att1 = f1_attributes[attribute]["Value"]
 
         # Read attribute from output 2, report as difference if attribute does not exist
         try:
-            att2 = f2.available_attributes()[attribute]["Value"]
+            att2 = f2_attributes[attribute]["Value"]
         except Exception:
             num_differences += 1
             if verbose:
@@ -143,7 +148,7 @@ def main():
             continue
 
         # Compare the attributes based on types
-        if f1.available_attributes()[attribute]["Type"] == "string":
+        if f1_attributes[attribute]["Type"] == "string":
             if att1 != att2:
                 num_differences += 1
                 if verbose:
@@ -241,6 +246,7 @@ def main():
     else:
         print(colored(f"{num_differences} differences found between {output1} and {output2}", attrs=["bold"]))
 
+    # Exit with appropriate status code: 0 if no differences (success), 1 otherwise (fail)
     sys.exit(0 if num_differences == 0 else 1)
 
 
