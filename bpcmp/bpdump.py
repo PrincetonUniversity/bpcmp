@@ -1,5 +1,6 @@
 import os
 import argparse
+from importlib import metadata
 import adios2 as ad
 from collections import OrderedDict
 
@@ -13,7 +14,7 @@ def main():
     """
 
     # Print welcome message
-    print("bpdump: ADIOS2 bp dump utility\n")
+    print(f"bpdump: ADIOS2 bp dump utility, v{metadata.version('bpcmp')}\n")
 
     # Define arguments
     description = "bpdump utility for dumping ADIOS2 bp output content"
@@ -25,7 +26,7 @@ def main():
 
     # Check if the output file exists
     if not os.path.exists(args.bpout):
-        raise FileNotFoundError(f"ERROR: Output file does not exist: {args.bpout}")
+        raise FileNotFoundError(f"Output file does not exist: {args.bpout}")
 
     # Open the ADIOS2 bp output using a context manager
     with ad.FileReader(args.bpout) as bpout:
