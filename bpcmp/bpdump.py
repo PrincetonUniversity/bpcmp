@@ -20,6 +20,7 @@ def main():
     description = "bpdump utility for dumping ADIOS2 bp output content"
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("bpout", help="Path to the ADIOS2 bp output file")
+    parser.add_argument("--vars", help="Dump specified variable(s) only", nargs="+", default=None)
 
     # Parse command line arguments
     args = parser.parse_args()
@@ -48,6 +49,9 @@ def main():
     for key, item in ordered_dict.items():
         # Skip displaying 'description' and 'units' entries directly
         if any(val in key for val in ["description", "units"]):
+            continue
+
+        if args.vars and key not in args.vars:
             continue
 
         # Display associated 'description' if it exists

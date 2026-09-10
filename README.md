@@ -45,3 +45,4 @@ Also included is a `bpdump` utility for dumping the contents of ADIOS2 bp output
 ```
 bpdump out1.bp
 ```
+There is an optional `--vars` which will dump only the specified variables.
